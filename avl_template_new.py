@@ -1,8 +1,8 @@
-#username - complete info
-#id1      - complete info 
-#name1    - complete info 
+#username - yotamzvieli
+#id1      - 209497023
+#name1    - Yotam Zvieli
 #id2      - complete info
-#name2    - complete info  
+#name2    - Nofar Shlomo
 
 
 
@@ -19,7 +19,9 @@ class AVLNode(object):
 		self.left = None
 		self.right = None
 		self.parent = None
-		self.height = -1 # Balance factor
+		self.height = -1
+		self.size = 0
+		self.balance_factor = 0
 		
 
 	"""returns the left child
@@ -27,7 +29,7 @@ class AVLNode(object):
 	@returns: the left child of self, None if there is no left child
 	"""
 	def getLeft(self):
-		return None
+		return self.left
 
 
 	"""returns the right child
@@ -36,7 +38,7 @@ class AVLNode(object):
 	@returns: the right child of self, None if there is no right child
 	"""
 	def getRight(self):
-		return None
+		return self.right
 
 	"""returns the parent 
 
@@ -44,7 +46,7 @@ class AVLNode(object):
 	@returns: the parent of self, None if there is no parent
 	"""
 	def getParent(self):
-		return None
+		return self.parent
 
 	"""return the value
 
@@ -52,7 +54,7 @@ class AVLNode(object):
 	@returns: the value of self, None if the node is virtual
 	"""
 	def getValue(self):
-		return None
+		return self.value if self.height != -1 else None
 
 	"""returns the height
 
@@ -60,7 +62,7 @@ class AVLNode(object):
 	@returns: the height of self, -1 if the node is virtual
 	"""
 	def getHeight(self):
-		return -1
+		return self.height
 
 	"""sets left child
 
@@ -68,7 +70,8 @@ class AVLNode(object):
 	@param node: a node
 	"""
 	def setLeft(self, node):
-		return None
+		self.left = node
+		self.update_node_fields()
 
 	"""sets right child
 
@@ -76,7 +79,8 @@ class AVLNode(object):
 	@param node: a node
 	"""
 	def setRight(self, node):
-		return None
+		self.right = node
+		self.update_node_fields()
 
 	"""sets parent
 
@@ -84,7 +88,7 @@ class AVLNode(object):
 	@param node: a node
 	"""
 	def setParent(self, node):
-		return None
+		self.parent = node
 
 	"""sets value
 
@@ -92,7 +96,7 @@ class AVLNode(object):
 	@param value: data
 	"""
 	def setValue(self, value):
-		return None
+		self.value = value
 
 	"""sets the balance factor of the node
 
@@ -100,7 +104,7 @@ class AVLNode(object):
 	@param h: the height
 	"""
 	def setHeight(self, h):
-		return None
+		self.height = h
 
 	"""returns whether self is not a virtual node 
 
@@ -108,8 +112,16 @@ class AVLNode(object):
 	@returns: False if self is a virtual node, True otherwise.
 	"""
 	def isRealNode(self):
-		return False
+		return False if self.height == -1 else True
 
+	"""update the node fields
+	@type AVL_node
+	@param size,height,balance_factor : correct size,height,balance_factor
+	"""
+	def update_node_fields(self):
+		self.size = self.left.size + self.right.size + 1
+		self.height = max(self.left.height, self.right.height) + 1
+		self.balance_factor = self.left.height - self.right.height
 
 
 """
@@ -134,7 +146,7 @@ class AVLTreeList(object):
 	@returns: True if the list is empty, False otherwise
 	"""
 	def empty(self):
-		return None
+		return True if self.size == 0 else False
 
 
 	"""retrieves the value of the i'th item in the list
