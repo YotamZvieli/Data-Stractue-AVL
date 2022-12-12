@@ -145,9 +145,9 @@ class AVLTreeList(object):
 
     """
 
-    def __init__(self):
+    def __init__(self,root=None):
         self.size = 0
-        self.root = None
+        self.root = root
 
     # add your fields here
 
@@ -170,7 +170,16 @@ class AVLTreeList(object):
     """
 
     def retrieve(self, i):
-        return None
+        if(self.root.left.size > i):
+            l = AVLTreeList(self.root.left)
+            return l.retrieve(i)
+        elif(self.root.left.size == i):
+            return self.root.value
+        else:
+            l = AVLTreeList(self.root.right)
+            left_size = self.root.left.size
+            return l.retrieve(i-left_size)
+
 
     """inserts val at position i in the list
 
@@ -184,7 +193,73 @@ class AVLTreeList(object):
     """
 
     def insert(self, i, val):
-        return -1
+        rotate_count = 0
+        node_to_insert = self.generate_new_node(val)
+        self.insert_node(node_to_insert, i)
+        curr_node = node_to_insert
+        while curr_node != None:
+            curr_node.update_node_fields()
+            if abs(curr_node.balance_factor) > 1:
+                self.rebalance_and_update(curr_node)
+                rotate_count += 1
+            curr_node = curr_node.parent
+        return rotate_count
+
+    def rebalance_and_update(self, node):
+        if node.balance_factor == 2 and node.left.balance_factor == 1:
+            node_positive_two = node
+            node_positive_one = node.left
+            parent = node.parent
+            if parent.left == node_positive_two:
+                parent.left = node_positive_one
+            else:
+                parent.right = node_positive_one
+            node_positive_one.parent = node_positive_two.parent
+            node_positive_one.right = node_positive_two
+            node_positive_two.parent = node_positive_one
+            node_positive_two.left = node_positive_one.right
+            node_positive_two.left.parent = node_positive_two
+        elif node.balance_factor == -2 and node.right.balance_factor == -1:
+            node_neg_two = node
+            node_neg_one = node.right
+            parent = node.parent
+            if parent.right == node_neg_two:
+                parent.right = node_neg_one
+            else:
+                parent.left = node_neg_one
+
+
+
+    def generate_new_node(self, val):
+        node_to_insert = AVLNode(val)
+        right_vir = AVLNode(None)
+        left_vir = AVLNode(None)
+        node_to_insert.left = left_vir
+        left_vir.parent = node_to_insert
+        right_vir.parent = node_to_insert
+        node_to_insert.right = right_vir
+        node_to_insert.update_node_fields()
+        return node_to_insert
+
+
+
+    def insert_node(self,node,i):
+        if i == 0:
+            node_to_insert_before = self.retrieve(0)
+            node_to_insert_before.left = node
+            node.parent = node_to_insert_before
+        else:
+            node_to_insert_after = self.retrieve(i-1)
+            if node_to_insert_after.right.isRealNode:
+                successor = self.succesor(node_to_insert_after)
+                successor.left = node
+                node.parent = successor
+            else:
+                node_to_insert_after.right = node
+                node.parent = node_to_insert_after
+
+    def succesor(self,node):
+        return None
 
     """deletes the i'th item in the list
 
@@ -205,7 +280,7 @@ class AVLTreeList(object):
     """
 
     def first(self):
-        return None
+        return None if self.empty() else self.retrieve(0)
 
     """returns the value of the last item in the list
 
@@ -214,7 +289,7 @@ class AVLTreeList(object):
     """
 
     def last(self):
-        return None
+        return None if self.empty() else self.retrieve(self.length()-1)
 
     """returns an array representing list 
 
@@ -232,7 +307,7 @@ class AVLTreeList(object):
     """
 
     def length(self):
-        return None
+        return self.root.size
 
     """sort the info values of the list
 
