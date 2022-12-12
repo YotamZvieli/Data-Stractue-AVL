@@ -122,7 +122,7 @@ class AVLNode(object):
     """
 
     def isRealNode(self):
-        return self.height == -1
+        return self.height != -1
 
     """
     update size, height and balance factor node fields
