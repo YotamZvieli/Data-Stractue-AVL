@@ -200,34 +200,99 @@ class AVLTreeList(object):
         while curr_node != None:
             curr_node.update_node_fields()
             if abs(curr_node.balance_factor) > 1:
-                self.rebalance_and_update(curr_node)
-                rotate_count += 1
+                curr_node, temp_cnt = self.rebalance_and_update(curr_node, rotate_count)
+                rotate_count += temp_cnt
+            else:
+                curr_node.update_node_fields()
             curr_node = curr_node.parent
         return rotate_count
 
-    def rebalance_and_update(self, node):
+    def rebalance_and_update(self, node,cnt):
+        isRoot = True if node.parent == None else False
         if node.balance_factor == 2 and node.left.balance_factor == 1:
             node_positive_two = node
             node_positive_one = node.left
             parent = node.parent
-            if parent.left == node_positive_two:
-                parent.left = node_positive_one
-            else:
-                parent.right = node_positive_one
+            if not (isRoot):
+                if parent.left == node_positive_two:
+                    parent.left = node_positive_one
+                else:
+                    parent.right = node_positive_one
             node_positive_one.parent = node_positive_two.parent
             node_positive_one.right = node_positive_two
             node_positive_two.parent = node_positive_one
             node_positive_two.left = node_positive_one.right
             node_positive_two.left.parent = node_positive_two
+            node_positive_two.update_node_fields()
+            node_positive_one.update_node_fields()
+            cnt += 1
+            return (node_positive_one,cnt)
         elif node.balance_factor == -2 and node.right.balance_factor == -1:
             node_neg_two = node
             node_neg_one = node.right
             parent = node.parent
-            if parent.right == node_neg_two:
-                parent.right = node_neg_one
-            else:
-                parent.left = node_neg_one
-
+            if not (isRoot):
+                if parent.right == node_neg_two:
+                    parent.right = node_neg_one
+                else:
+                    parent.left = node_neg_one
+            node_neg_one.left = node_neg_two
+            node_neg_one.parent = node_neg_two.parent
+            node_neg_two.parent = node_neg_one
+            node_neg_two.right = node_neg_one.left
+            node_neg_two.right.parent = node_neg_two
+            node_neg_two.update_node_fields()
+            node_neg_one.update_node_fields()
+            cnt += 1
+            return (node_neg_one, cnt)
+        elif node.balance_factor == -2 and node.right.balance_factor == 1:
+            node_neg_two = node
+            node_pos_one = node.right
+            node_zero = node.right.left
+            parent = node.parent
+            if not (isRoot):
+                if parent.right == node_neg_two:
+                    parent.right = node_zero
+                else:
+                    parent.left = node_zero
+            node_neg_two.parent = node_zero
+            node_neg_two.right = node_zero.left
+            node_zero.left.parent = node_neg_two
+            node_zero.left = node_neg_two
+            node_zero.right = node_pos_one
+            node_zero.parent = parent
+            node_pos_one.parent = node_zero
+            node_pos_one.left = node_zero.right
+            node_zero.right.parent = node_pos_one
+            node_neg_two.update_node_fields()
+            node_pos_one.update_node_fields()
+            node_zero.update_node_fields()
+            cnt += 2
+            return (node_zero, cnt)
+        else:
+            node_pos_two = node
+            node_neg_one = node.left
+            node_zero = node.left.right
+            parent = node.parent
+            if not (isRoot):
+                if parent.right == node_pos_two:
+                    parent.right = node_zero
+                else:
+                    parent.left = node_zero
+            node_pos_two.parent = node_zero
+            node_pos_two.left = node_zero.right
+            node_zero.right.parent = node_pos_two
+            node_neg_one.parent = node_zero
+            node_neg_one.right = node_zero.left
+            node_zero.left.parent = node_neg_one
+            node_zero.left = node_neg_one
+            node_zero.right = node_pos_two
+            node_zero.parent = parent
+            node_pos_two.update_node_fields()
+            node_neg_one.update_node_fields()
+            node_zero.update_node_fields()
+            cnt += 2
+            return (node_zero, cnt)
 
 
     def generate_new_node(self, val):
@@ -259,7 +324,18 @@ class AVLTreeList(object):
                 node.parent = node_to_insert_after
 
     def succesor(self,node):
-        return None
+        curr = node
+        if(node.right.isRealNode):
+            return self.min(node.right)
+        else:
+            while curr.parent == curr.parent.right and curr.parent != None:
+                curr = curr.parent
+            return curr.parent
+
+    def min(self,node):
+        while node.left.isRealNode:
+            node = node.left
+        return node
 
     """deletes the i'th item in the list
 
@@ -273,6 +349,11 @@ class AVLTreeList(object):
     def delete(self, i):
         return -1
 
+    def delete_node(self,i):
+        node_to_del = self.retrieve(i)
+        if(node_to_del.left)
+    def isLeaf(self,node):
+        return not(node.left.isRealNode)
     """returns the value of the first item in the list
 
     @rtype: str
