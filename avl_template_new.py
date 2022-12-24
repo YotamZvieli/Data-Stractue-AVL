@@ -361,7 +361,7 @@ class AVLTreeList(object):
     """
 
     def first(self):
-        return None if self.empty() else self.retrieve(0)
+        return None if self.empty() else self.retrieve(0).value
 
     """returns the value of the last item in the list
 
@@ -370,7 +370,7 @@ class AVLTreeList(object):
     """
 
     def last(self):
-        return None if self.empty() else self.retrieve(self.length()-1)
+        return None if self.empty() else self.retrieve(self.length()-1).value
 
     """returns an array representing list 
 
