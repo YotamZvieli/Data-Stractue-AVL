@@ -244,7 +244,7 @@ class AVLTreeList(object):
             node_positive_one.update_node_fields()
             cnt += 1
             return (node_positive_one,cnt)
-        elif node.balance_factor == -2 and node.right.balance_factor == -1:
+        elif node.balance_factor == -2 and (node.right.balance_factor == -1 or node.right.balance_factor == 0):
             node_neg_two = node
             node_neg_one = node.right
             parent = node.parent
@@ -286,7 +286,7 @@ class AVLTreeList(object):
             node_zero.update_node_fields()
             cnt += 2
             return (node_zero, cnt)
-        else:
+        elif node.balance_factor == 2 and (node.left.balance_factor == -1 or node.left.balance_factor == 0):
             node_pos_two = node
             node_neg_one = node.left
             node_zero = node.left.right
@@ -403,6 +403,7 @@ class AVLTreeList(object):
             successor = self.succesor(node_to_del)
             node_to_del.value = successor.value
             return self.del_simple_case(successor)
+
     def del_simple_case(self,node_to_del):
         parent = AVLNode(None)
         if(node_to_del.parent == None and (not node_to_del.left.isRealNode() or not node_to_del.right.isRealNode())):
@@ -423,17 +424,17 @@ class AVLTreeList(object):
             else:
                 parent.right = node_to_del.left  # replace node to del with virtual node
             node_to_del.left.parent = parent
-        elif (self.isLeaf(node_to_del.left)):
+        elif (self.isLeaf(node_to_del.left) and (not node_to_del.right.isRealNode())): # left is leaf and right is virtual
             parent = node_to_del.parent
-            son = node_to_del.right
+            son = node_to_del.left
             if (parent.left == node_to_del):
                 parent.left = son
             else:
                 parent.right = son
             son.parent = parent
-        elif (self.isLeaf(node_to_del.right)):
+        elif (self.isLeaf(node_to_del.right) and (not node_to_del.left.isRealNode())): # right is leaf and left is virtual
             parent = node_to_del.parent
-            son = node_to_del.left
+            son = node_to_del.right
             if (parent.left == node_to_del):
                 parent.left = son
             else:
