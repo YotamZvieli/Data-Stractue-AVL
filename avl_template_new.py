@@ -183,6 +183,8 @@ class AVLTreeList(object):
             return l.retrieve_node(i-left_size-1)
 
     def retrieve(self,i):
+        if(i >= self.length() or i < 0):
+            return None
         return self.retrieve_node(i).value
 
 
@@ -202,6 +204,7 @@ class AVLTreeList(object):
         if(self.root == None):
             self.root = self.generate_new_node(val)
             self.root.update_node_fields()
+            self.size = self.root.size
             return 0
         rotate_count = 0
         node_to_insert = self.generate_new_node(val)
@@ -216,9 +219,9 @@ class AVLTreeList(object):
                 curr_node.update_node_fields()
             prev = curr_node
             curr_node = curr_node.parent
-        self.update_firls_last()
         self.size = prev.size
         self.root = prev
+        self.update_firls_last()
         return rotate_count
 
     def rebalance_and_update(self, node,cnt):
@@ -233,9 +236,9 @@ class AVLTreeList(object):
                 else:
                     parent.right = node_positive_one
             node_positive_one.parent = node_positive_two.parent
+            node_positive_two.left = node_positive_one.right
             node_positive_one.right = node_positive_two
             node_positive_two.parent = node_positive_one
-            node_positive_two.left = node_positive_one.right
             node_positive_two.left.parent = node_positive_two
             node_positive_two.update_node_fields()
             node_positive_one.update_node_fields()
@@ -271,13 +274,13 @@ class AVLTreeList(object):
                     parent.left = node_zero
             node_neg_two.parent = node_zero
             node_neg_two.right = node_zero.left
+            node_pos_one.parent = node_zero
+            node_pos_one.left = node_zero.right
+            node_zero.right.parent = node_pos_one
             node_zero.left.parent = node_neg_two
             node_zero.left = node_neg_two
             node_zero.right = node_pos_one
             node_zero.parent = parent
-            node_pos_one.parent = node_zero
-            node_pos_one.left = node_zero.right
-            node_zero.right.parent = node_pos_one
             node_neg_two.update_node_fields()
             node_pos_one.update_node_fields()
             node_zero.update_node_fields()
@@ -361,7 +364,19 @@ class AVLTreeList(object):
     """
 
     def delete(self, i):
+        if(i < 0 or i >= self.length()):
+            return -1
+        if(self.length() == 1):
+            self.root = None
+            self.size = 0
+            self.firstItem = None
+            self.lastItem = None
+            return 0
         parent_deleted = self.delete_node(i)
+        if(parent_deleted == None):
+            self.size = self.root.size
+            self.update_firls_last()
+            return 0
         rotate_count = 0
         curr_node = parent_deleted
         while curr_node != None:
@@ -373,24 +388,34 @@ class AVLTreeList(object):
                 curr_node.update_node_fields()
             prev = curr_node
             curr_node = curr_node.parent
-        self.update_firls_last()
         self.size = prev.size
         self.root = prev
+        self.update_firls_last()
         return rotate_count
 
 
     def delete_node(self,i):
         node_to_del = self.retrieve_node(i)
         parent = self.del_simple_case(node_to_del)
-        if parent != None:
+        if(parent == None or parent.isRealNode()):
             return parent
         else:
             successor = self.succesor(node_to_del)
             node_to_del.value = successor.value
             return self.del_simple_case(successor)
-
     def del_simple_case(self,node_to_del):
-        parent = None
+        parent = AVLNode(None)
+        if(node_to_del.parent == None and (not node_to_del.left.isRealNode() or not node_to_del.right.isRealNode())):
+            if(self.isLeaf(node_to_del)):
+                self.root = None
+                return None
+            elif(node_to_del.left.isRealNode()):
+                self.root = node_to_del.left
+                return None
+            else:
+                self.root = node_to_del.right
+                return None
+
         if (self.isLeaf(node_to_del)):
             parent = node_to_del.parent
             if (parent.left == node_to_del):
@@ -417,7 +442,9 @@ class AVLTreeList(object):
         return parent
 
     def isLeaf(self,node):
-        return not(node.left.isRealNode())
+        if(not node.isRealNode()):
+            return False
+        return not(node.left.isRealNode() or node.right.isRealNode())
     """returns the value of the first item in the list
 
     @rtype: str
@@ -504,7 +531,7 @@ class AVLTreeList(object):
     """
 
     def getRoot(self):
-        return None
+        return self.root
 
     def printt(self):
         out = ""
