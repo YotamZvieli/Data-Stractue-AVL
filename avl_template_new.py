@@ -6,6 +6,7 @@
 
 
 """A class represnting a node in an AVL tree"""
+import random
 
 
 class AVLNode(object):
@@ -471,7 +472,17 @@ class AVLTreeList(object):
     """
 
     def listToArray(self):
-        return None
+        return self.listToArrayRec(self.root)
+
+    def listToArrayRec(self,node):
+        if (not node.isRealNode()):
+            return []
+        if (self.isLeaf(node)):
+            return [node.value]
+        else:
+            return self.listToArrayRec(node.left) + [node.value] + self.listToArrayRec(node.right)
+
+
 
     """returns the size of the list 
 
@@ -492,7 +503,25 @@ class AVLTreeList(object):
     """
 
     def sort(self):
-        return None
+        lst = self.listToArray()
+        lst = self.quick_sort(lst)
+        global random_lst
+        random_lst = lst
+        self.set_new_val_rec(self.root)
+
+    def quick_sort(self,lst):
+        if(len(lst) <= 1):
+            return lst
+        else:
+            rand = random
+            pivot = rand.randint(0, len(lst) - 1)
+            temp = lst[pivot]
+            lst[pivot] = lst[-1]
+            lst[-1] = temp
+            bigger = [i for i in lst if i > temp]
+            smaller = [i for i in lst if i < temp]
+            return self.quick_sort(smaller) + [temp] + self.quick_sort(bigger)
+
 
     """permute the info values of the list 
 
@@ -501,8 +530,33 @@ class AVLTreeList(object):
     """
 
     def permutation(self):
-        return None
+        lst = self.listToArray()
+        global random_lst
+        random_lst = []
+        for i in range(self.length()):
+            index = self.generate_index(len(lst) - 1 - i)
+            random_lst.append(lst[index])
+            lst[index] = lst[len(lst) -1 - i]
+        self.set_new_val_rec(self.root)
+        return self
 
+    def set_new_val_rec(self,node):
+        print(random_lst)
+        if (not node.isRealNode()):
+            return None
+        if (self.isLeaf(node)):
+            node.value = random_lst[len(random_lst)-1]
+            random_lst.pop(len(random_lst)-1)
+            return None
+        self.set_new_val_rec(node.left)
+        node.value = random_lst[len(random_lst) - 1]
+        random_lst.pop(len(random_lst) - 1)
+        self.set_new_val_rec(node.right)
+
+
+    def generate_index(self, len):
+        rand = random
+        return rand.randint(0,len)
     """concatenates lst to self
 
     @type lst: AVLTreeList
@@ -512,7 +566,20 @@ class AVLTreeList(object):
     """
 
     def concat(self, lst):
-        return None
+        self_is_smaller = False
+        if (self.length() <= lst.length()):
+            h = self.root.height
+            self_is_smaller = True
+        else:
+            h = lst.root.height
+        if(self_is_smaller):
+            connect_node = lst.retrieve_node(0)
+            lst.delete(0)
+            curr_node = lst.root
+            while curr_node.height > h:
+                curr_node = curr_node.left
+
+
 
     """searches for a *value* in the list
 
@@ -523,7 +590,11 @@ class AVLTreeList(object):
     """
 
     def search(self, val):
-        return None
+        lst = self.listToArray()
+        for i in range(len(lst)):
+            if(lst[i] == val):
+                return i
+        return -1
 
     """returns the root of the tree representing the list
 
