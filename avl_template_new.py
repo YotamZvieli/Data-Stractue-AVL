@@ -33,6 +33,9 @@ class AVLNode(object):
     def getLeft(self):
         return self.left
 
+    def getSize(self):
+        return self.size
+
     """returns the right child
 
     @rtype: AVLNode
@@ -146,7 +149,7 @@ class AVLTreeList(object):
 
     """
 
-    def __init__(self,root=None):
+    def __init__(self, root=None):
         self.size = 0
         self.root = root
         self.firstItem = None
@@ -173,22 +176,20 @@ class AVLTreeList(object):
     """
 
     def retrieve_node(self, i):
-        if(self.root.left.size > i):
+        if (self.root.left.size > i):
             l = AVLTreeList(self.root.left)
             return l.retrieve_node(i)
-        elif(self.root.left.size == i):
+        elif (self.root.left.size == i):
             return self.root
         else:
             l = AVLTreeList(self.root.right)
             left_size = self.root.left.size
-            return l.retrieve_node(i-left_size-1)
+            return l.retrieve_node(i - left_size - 1)
 
-    def retrieve(self,i):
-        if(i >= self.length() or i < 0):
+    def retrieve(self, i):
+        if (i >= self.length() or i < 0):
             return None
         return self.retrieve_node(i).value
-
-
 
     """inserts val at position i in the list
 
@@ -202,7 +203,7 @@ class AVLTreeList(object):
     """
 
     def insert(self, i, val):
-        if(self.root == None):
+        if (self.root == None):
             self.root = self.generate_new_node(val)
             self.root.update_node_fields()
             self.size = self.root.size
@@ -225,7 +226,7 @@ class AVLTreeList(object):
         self.update_firls_last()
         return rotate_count
 
-    def rebalance_and_update(self, node,cnt):
+    def rebalance_and_update(self, node, cnt):
         isRoot = True if node.parent == None else False
         if node.balance_factor == 2 and node.left.balance_factor == 1:
             node_positive_two = node
@@ -244,7 +245,7 @@ class AVLTreeList(object):
             node_positive_two.update_node_fields()
             node_positive_one.update_node_fields()
             cnt += 1
-            return (node_positive_one,cnt)
+            return (node_positive_one, cnt)
         elif node.balance_factor == -2 and (node.right.balance_factor == -1 or node.right.balance_factor == 0):
             node_neg_two = node
             node_neg_one = node.right
@@ -324,9 +325,7 @@ class AVLTreeList(object):
         node_to_insert.update_node_fields()
         return node_to_insert
 
-
-
-    def insert_node(self,node,i):
+    def insert_node(self, node, i):
         if i == 0:
             node_to_insert_before = self.retrieve_node(0)
             node_to_insert_before.left = node
@@ -341,16 +340,16 @@ class AVLTreeList(object):
                 node_to_insert_after.right = node
                 node.parent = node_to_insert_after
 
-    def succesor(self,node):
+    def succesor(self, node):
         curr = node
-        if(node.right.isRealNode()):
+        if (node.right.isRealNode()):
             return self.min(node.right)
         else:
             while curr.parent == curr.parent.right and curr.parent != None:
                 curr = curr.parent
             return curr.parent
 
-    def min(self,node):
+    def min(self, node):
         while node.left.isRealNode():
             node = node.left
         return node
@@ -365,16 +364,16 @@ class AVLTreeList(object):
     """
 
     def delete(self, i):
-        if(i < 0 or i >= self.length()):
+        if (i < 0 or i >= self.length()):
             return -1
-        if(self.length() == 1):
+        if (self.length() == 1):
             self.root = None
             self.size = 0
             self.firstItem = None
             self.lastItem = None
             return 0
         parent_deleted = self.delete_node(i)
-        if(parent_deleted == None):
+        if (parent_deleted == None):
             self.size = self.root.size
             self.update_firls_last()
             return 0
@@ -394,24 +393,23 @@ class AVLTreeList(object):
         self.update_firls_last()
         return rotate_count
 
-
-    def delete_node(self,i):
+    def delete_node(self, i):
         node_to_del = self.retrieve_node(i)
         parent = self.del_simple_case(node_to_del)
-        if(parent == None or parent.isRealNode()):
+        if (parent == None or parent.isRealNode()):
             return parent
         else:
             successor = self.succesor(node_to_del)
             node_to_del.value = successor.value
             return self.del_simple_case(successor)
 
-    def del_simple_case(self,node_to_del):
+    def del_simple_case(self, node_to_del):
         parent = AVLNode(None)
-        if(node_to_del.parent == None and (not node_to_del.left.isRealNode() or not node_to_del.right.isRealNode())):
-            if(self.isLeaf(node_to_del)):
+        if (node_to_del.parent == None and (not node_to_del.left.isRealNode() or not node_to_del.right.isRealNode())):
+            if (self.isLeaf(node_to_del)):
                 self.root = None
                 return None
-            elif(node_to_del.left.isRealNode()):
+            elif (node_to_del.left.isRealNode()):
                 self.root = node_to_del.left
                 return None
             else:
@@ -425,7 +423,8 @@ class AVLTreeList(object):
             else:
                 parent.right = node_to_del.left  # replace node to del with virtual node
             node_to_del.left.parent = parent
-        elif (self.isLeaf(node_to_del.left) and (not node_to_del.right.isRealNode())): # left is leaf and right is virtual
+        elif (self.isLeaf(node_to_del.left) and (
+        not node_to_del.right.isRealNode())):  # left is leaf and right is virtual
             parent = node_to_del.parent
             son = node_to_del.left
             if (parent.left == node_to_del):
@@ -433,7 +432,8 @@ class AVLTreeList(object):
             else:
                 parent.right = son
             son.parent = parent
-        elif (self.isLeaf(node_to_del.right) and (not node_to_del.left.isRealNode())): # right is leaf and left is virtual
+        elif (self.isLeaf(node_to_del.right) and (
+        not node_to_del.left.isRealNode())):  # right is leaf and left is virtual
             parent = node_to_del.parent
             son = node_to_del.right
             if (parent.left == node_to_del):
@@ -443,10 +443,11 @@ class AVLTreeList(object):
             son.parent = parent
         return parent
 
-    def isLeaf(self,node):
-        if(not node.isRealNode()):
+    def isLeaf(self, node):
+        if (not node.isRealNode()):
             return False
-        return not(node.left.isRealNode() or node.right.isRealNode())
+        return not (node.left.isRealNode() or node.right.isRealNode())
+
     """returns the value of the first item in the list
 
     @rtype: str
@@ -474,15 +475,13 @@ class AVLTreeList(object):
     def listToArray(self):
         return self.listToArrayRec(self.root)
 
-    def listToArrayRec(self,node):
+    def listToArrayRec(self, node):
         if (not node.isRealNode()):
             return []
         if (self.isLeaf(node)):
             return [node.value]
         else:
             return self.listToArrayRec(node.left) + [node.value] + self.listToArrayRec(node.right)
-
-
 
     """returns the size of the list 
 
@@ -491,7 +490,7 @@ class AVLTreeList(object):
     """
 
     def length(self):
-        if(self.root == None):
+        if (self.root == None):
             return 0
         else:
             return self.size
@@ -509,8 +508,8 @@ class AVLTreeList(object):
         random_lst = lst
         self.set_new_val_rec(self.root)
 
-    def quick_sort(self,lst):
-        if(len(lst) <= 1):
+    def quick_sort(self, lst):
+        if (len(lst) <= 1):
             return lst
         else:
             rand = random
@@ -521,7 +520,6 @@ class AVLTreeList(object):
             bigger = [i for i in lst if i > temp]
             smaller = [i for i in lst if i < temp]
             return self.quick_sort(smaller) + [temp] + self.quick_sort(bigger)
-
 
     """permute the info values of the list 
 
@@ -536,27 +534,27 @@ class AVLTreeList(object):
         for i in range(self.length()):
             index = self.generate_index(len(lst) - 1 - i)
             random_lst.append(lst[index])
-            lst[index] = lst[len(lst) -1 - i]
+            lst[index] = lst[len(lst) - 1 - i]
         self.set_new_val_rec(self.root)
         return self
 
-    def set_new_val_rec(self,node):
+    def set_new_val_rec(self, node):
         print(random_lst)
         if (not node.isRealNode()):
             return None
         if (self.isLeaf(node)):
-            node.value = random_lst[len(random_lst)-1]
-            random_lst.pop(len(random_lst)-1)
+            node.value = random_lst[len(random_lst) - 1]
+            random_lst.pop(len(random_lst) - 1)
             return None
         self.set_new_val_rec(node.left)
         node.value = random_lst[len(random_lst) - 1]
         random_lst.pop(len(random_lst) - 1)
         self.set_new_val_rec(node.right)
 
-
     def generate_index(self, len):
         rand = random
-        return rand.randint(0,len)
+        return rand.randint(0, len)
+
     """concatenates lst to self
 
     @type lst: AVLTreeList
@@ -566,20 +564,83 @@ class AVLTreeList(object):
     """
 
     def concat(self, lst):
+        if (lst.empty() and not self.empty()):
+            return self.root.height
+        if (not lst.empty() and self.empty()):
+            return lst.root.height
+        if (self.empty() and lst.empty()):
+            return 0
+        h_diff = abs(lst.root.height - self.root.height)
         self_is_smaller = False
         if (self.length() <= lst.length()):
             h = self.root.height
             self_is_smaller = True
         else:
             h = lst.root.height
-        if(self_is_smaller):
+        if (h_diff == 0):  # even trees size
+            connect_node = lst.retrieve_node(0)
+            lst.delete(0)
+            connect_node.left = self.root
+            self.root.parent = connect_node
+            connect_node.right = lst.root
+            lst.root.parent = connect_node
+            self.root = connect_node
+            self.root.update_node_fields()
+            self.size = self.root.size
+            self.update_firls_last()
+        elif (self_is_smaller):
             connect_node = lst.retrieve_node(0)
             lst.delete(0)
             curr_node = lst.root
             while curr_node.height > h:
                 curr_node = curr_node.left
-
-
+            parent = curr_node.parent
+            connect_node.left = self.root
+            self.root.parent = connect_node
+            connect_node.right = connect_node
+            curr_node.parent = connect_node
+            parent.left = connect_node
+            connect_node.parent = parent
+            connect_node.update_node_fields()
+            connect_node = parent
+            while connect_node != None:
+                connect_node.update_node_fields()
+                if abs(connect_node.balance_factor) > 1:
+                    connect_node, temp_cnt = self.rebalance_and_update(connect_node, 0)
+                else:
+                    connect_node.update_node_fields()
+                prev = connect_node
+                connect_node = connect_node.parent
+            self.size = prev.size
+            self.root = prev
+            self.update_firls_last()
+        else:
+            connected_node = self.retrieve_node(self.length() - 1)
+            self.delete(self.length() - 1)
+            curr_node = self.root
+            while curr_node.height > h:
+                curr_node = curr_node.right
+            parent = curr_node.parent
+            connected_node.right = lst.root
+            lst.root.parent = connected_node
+            connected_node.left = curr_node
+            curr_node.parent = connected_node
+            connected_node.parent = parent
+            parent.right = connected_node
+            connected_node.update_node_fields()
+            connected_node = parent
+            while connected_node != None:
+                connected_node.update_node_fields()
+                if abs(connected_node.balance_factor) > 1:
+                    connected_node, temp_cnt = self.rebalance_and_update(connected_node, 0)
+                else:
+                    connected_node.update_node_fields()
+                prev = connected_node
+                connected_node = connected_node.parent
+            self.size = prev.size
+            self.root = prev
+            self.update_firls_last()
+        return h_diff
 
     """searches for a *value* in the list
 
@@ -592,7 +653,7 @@ class AVLTreeList(object):
     def search(self, val):
         lst = self.listToArray()
         for i in range(len(lst)):
-            if(lst[i] == val):
+            if (lst[i] == val):
                 return i
         return -1
 
@@ -673,9 +734,10 @@ class AVLTreeList(object):
 
     def append(self, val):
         self.insert(self.length(), val)
+
     def update_firls_last(self):
         self.firstItem = self.retrieve_node(0)
-        if(self.length() == 0):
+        if (self.length() == 0):
             self.lastItem = self.firstItem
         else:
             self.lastItem = self.retrieve_node(self.length() - 1)
