@@ -411,6 +411,7 @@ class AVLTreeList(object):
                 return None
             elif (node_to_del.left.isRealNode()):
                 self.root = node_to_del.left
+                self.root.parent = None
                 return None
             else:
                 self.root = node_to_del.right
@@ -567,6 +568,10 @@ class AVLTreeList(object):
         if (lst.empty() and not self.empty()):
             return self.root.height
         if (not lst.empty() and self.empty()):
+            self.root = lst.root
+            self.size = lst.size
+            self.firstItem = lst.firstItem
+            self.lastItem = lst.lastItem
             return lst.root.height
         if (self.empty() and lst.empty()):
             return 0
@@ -597,7 +602,7 @@ class AVLTreeList(object):
             parent = curr_node.parent
             connect_node.left = self.root
             self.root.parent = connect_node
-            connect_node.right = connect_node
+            connect_node.right = curr_node
             curr_node.parent = connect_node
             parent.left = connect_node
             connect_node.parent = parent
@@ -651,6 +656,8 @@ class AVLTreeList(object):
     """
 
     def search(self, val):
+        if(self.empty()):
+            return -1
         lst = self.listToArray()
         for i in range(len(lst)):
             if (lst[i] == val):
@@ -733,7 +740,7 @@ class AVLTreeList(object):
         return i
 
     def append(self, val):
-        self.insert(self.length(), val)
+        return self.insert(self.length(), val)
 
     def update_firls_last(self):
         self.firstItem = self.retrieve_node(0)
