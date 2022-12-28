@@ -313,7 +313,6 @@ class AVLTreeList(object):
             cnt += 2
             return (node_zero, cnt)
 
-
     def generate_new_node(self, val):
         node_to_insert = AVLNode(val)
         right_vir = AVLNode(None)
@@ -425,7 +424,7 @@ class AVLTreeList(object):
                 parent.right = node_to_del.left  # replace node to del with virtual node
             node_to_del.left.parent = parent
         elif (self.isLeaf(node_to_del.left) and (
-        not node_to_del.right.isRealNode())):  # left is leaf and right is virtual
+                not node_to_del.right.isRealNode())):  # left is leaf and right is virtual
             parent = node_to_del.parent
             son = node_to_del.left
             if (parent.left == node_to_del):
@@ -434,7 +433,7 @@ class AVLTreeList(object):
                 parent.right = son
             son.parent = parent
         elif (self.isLeaf(node_to_del.right) and (
-        not node_to_del.left.isRealNode())):  # right is leaf and left is virtual
+                not node_to_del.left.isRealNode())):  # right is leaf and left is virtual
             parent = node_to_del.parent
             son = node_to_del.right
             if (parent.left == node_to_del):
@@ -494,7 +493,7 @@ class AVLTreeList(object):
         if (self.root == None):
             return 0
         else:
-            return self.size
+            return self.root.size
 
     """sort the info values of the list
 
@@ -505,9 +504,7 @@ class AVLTreeList(object):
     def sort(self):
         lst = self.listToArray()
         lst = self.quick_sort(lst)
-        global random_lst
-        random_lst = lst
-        self.set_new_val_rec(self.root)
+        return self.set_new_val_rec(lst, 0, len(lst)-1)
 
     def quick_sort(self, lst):
         if (len(lst) <= 1):
@@ -530,27 +527,57 @@ class AVLTreeList(object):
 
     def permutation(self):
         lst = self.listToArray()
-        global random_lst
         random_lst = []
         for i in range(self.length()):
             index = self.generate_index(len(lst) - 1 - i)
             random_lst.append(lst[index])
             lst[index] = lst[len(lst) - 1 - i]
-        self.set_new_val_rec(self.root)
-        return self
 
-    def set_new_val_rec(self, node):
-        print(random_lst)
-        if (not node.isRealNode()):
-            return None
-        if (self.isLeaf(node)):
-            node.value = random_lst[len(random_lst) - 1]
-            random_lst.pop(len(random_lst) - 1)
-            return None
-        self.set_new_val_rec(node.left)
-        node.value = random_lst[len(random_lst) - 1]
-        random_lst.pop(len(random_lst) - 1)
-        self.set_new_val_rec(node.right)
+        return self.set_new_val_rec(random_lst, 0, len(random_lst)-1)
+
+    def set_new_val_rec(self, lst, start, end):
+        if (start > end):
+            return AVLTreeList()
+        if end - start == 0:
+            root = self.generate_new_node(lst[start])
+            tree = AVLTreeList(root)
+            tree.size = 1
+            tree.update_firls_last()
+            return tree
+        # if end - start == 1:
+        #     avl = AVLTreeList()
+        #     if(lst[start] >= lst[end]):
+        #        avl.insert(0,lst[end])
+        #        avl.insert(1,lst[start])
+        #        return avl
+        #     else:
+        #         avl.insert(0, lst[start])
+        #         avl.insert(1, lst[end])
+        #         return avl
+        smaller_tree = self.set_new_val_rec(lst, start, (end + start)// 2 - 1)
+        bigger_tree = self.set_new_val_rec(lst, (end + start) // 2 + 1, end)
+        median = lst[(end + start)//2]
+        avl_median = AVLTreeList(self.generate_new_node(median))
+
+        avl_median.size = 1
+        avl_median.update_firls_last()
+        if (smaller_tree.empty() and bigger_tree.empty()):
+            return avl_median
+        elif (smaller_tree.empty()):
+            avl_median.root.right = bigger_tree.root
+            bigger_tree.root.parent = avl_median.root
+        elif (bigger_tree.empty()):
+            avl_median.root.left = smaller_tree.root
+            smaller_tree.root.parent = avl_median.root
+        else:
+            avl_median.root.right = bigger_tree.root
+            bigger_tree.root.parent = avl_median.root
+            avl_median.root.left = smaller_tree.root
+            smaller_tree.root.parent = avl_median.root
+        avl_median.root.update_node_fields()
+        avl_median.size = avl_median.root.size
+        avl_median.update_firls_last()
+        return avl_median
 
     def generate_index(self, len):
         rand = random
@@ -656,7 +683,7 @@ class AVLTreeList(object):
     """
 
     def search(self, val):
-        if(self.empty()):
+        if (self.empty()):
             return -1
         lst = self.listToArray()
         for i in range(len(lst)):
