@@ -7,7 +7,7 @@
 
 """A class represnting a node in an AVL tree"""
 import random
-
+from interactive_tree import interactive_tree
 
 class AVLNode(object):
     """Constructor, you are allowed to add more fields.
@@ -228,7 +228,7 @@ class AVLTreeList(object):
 
     def rebalance_and_update(self, node, cnt):
         isRoot = True if node.parent == None else False
-        if node.balance_factor == 2 and node.left.balance_factor == 1:
+        if node.balance_factor == 2 and (node.left.balance_factor == 1 or node.left.balance_factor == 0):
             node_positive_two = node
             node_positive_one = node.left
             parent = node.parent
@@ -288,7 +288,7 @@ class AVLTreeList(object):
             node_zero.update_node_fields()
             cnt += 2
             return (node_zero, cnt)
-        elif node.balance_factor == 2 and (node.left.balance_factor == -1 or node.left.balance_factor == 0):
+        elif node.balance_factor == 2 and node.left.balance_factor == -1:
             node_pos_two = node
             node_neg_one = node.left
             node_zero = node.left.right
@@ -473,6 +473,8 @@ class AVLTreeList(object):
     """
 
     def listToArray(self):
+        if(self.size == 0):
+            return []
         return self.listToArrayRec(self.root)
 
     def listToArrayRec(self, node):
