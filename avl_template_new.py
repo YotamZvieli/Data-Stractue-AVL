@@ -132,7 +132,7 @@ class AVLNode(object):
     update size, height and balance factor node fields
     """
 
-    def update_node_fields(self):
+    def update_node_fields(self): #Func to update node fileds - O(1)
         self.size = self.left.size + self.right.size + 1
         self.height = max(self.left.height, self.right.height) + 1
         self.balance_factor = self.left.height - self.right.height
@@ -175,7 +175,7 @@ class AVLTreeList(object):
     @returns: the the value of the i'th item in the list
     """
 
-    def retrieve_node(self, i):
+    def retrieve_node(self, i): #rec func to retrieve node O(log n) run time
         if (self.root.left.size > i):
             l = AVLTreeList(self.root.left)
             return l.retrieve_node(i)
@@ -186,7 +186,7 @@ class AVLTreeList(object):
             left_size = self.root.left.size
             return l.retrieve_node(i - left_size - 1)
 
-    def retrieve(self, i):
+    def retrieve(self, i): #invelope func for retrieve node O(1) run time
         if (i >= self.length() or i < 0):
             return None
         return self.retrieve_node(i).value
@@ -202,7 +202,7 @@ class AVLTreeList(object):
     @returns: the number of rebalancing operation due to AVL rebalancing
     """
 
-    def insert(self, i, val):
+    def insert(self, i, val): #insert node O(log n)
         if (self.root == None):
             self.root = self.generate_new_node(val)
             self.root.update_node_fields()
@@ -226,7 +226,7 @@ class AVLTreeList(object):
         self.update_firls_last()
         return rotate_count
 
-    def rebalance_and_update(self, node, cnt):
+    def rebalance_and_update(self, node, cnt): #rebalance and update a specific node position if BF > 1 O(1) rum time
         isRoot = True if node.parent == None else False
         if node.balance_factor == 2 and (node.left.balance_factor == 1 or node.left.balance_factor == 0):
             node_positive_two = node
@@ -313,7 +313,7 @@ class AVLTreeList(object):
             cnt += 2
             return (node_zero, cnt)
 
-    def generate_new_node(self, val):
+    def generate_new_node(self, val): #genrate new node to insert with virtual suns - o(1) run time
         node_to_insert = AVLNode(val)
         right_vir = AVLNode(None)
         left_vir = AVLNode(None)
@@ -324,7 +324,7 @@ class AVLTreeList(object):
         node_to_insert.update_node_fields()
         return node_to_insert
 
-    def insert_node(self, node, i):
+    def insert_node(self, node, i): #insert the node and return the node to start rebalance and update - O(1)
         if i == 0:
             node_to_insert_before = self.retrieve_node(0)
             node_to_insert_before.left = node
@@ -339,7 +339,7 @@ class AVLTreeList(object):
                 node_to_insert_after.right = node
                 node.parent = node_to_insert_after
 
-    def succesor(self, node):
+    def succesor(self, node): # O(log n) run time
         curr = node
         if (node.right.isRealNode()):
             return self.min(node.right)
@@ -362,7 +362,7 @@ class AVLTreeList(object):
     @returns: the number of rebalancing operation due to AVL rebalancing
     """
 
-    def delete(self, i):
+    def delete(self, i): # o(log n) - one way trip update files and rotate
         if (i < 0 or i >= self.length()):
             return -1
         if (self.length() == 1):
@@ -392,7 +392,7 @@ class AVLTreeList(object):
         self.update_firls_last()
         return rotate_count
 
-    def delete_node(self, i):
+    def delete_node(self, i): #O(log n) - find and delete the node (replace with successor if needed)
         node_to_del = self.retrieve_node(i)
         parent = self.del_simple_case(node_to_del)
         if (parent == None or parent.isRealNode()):
@@ -402,7 +402,7 @@ class AVLTreeList(object):
             node_to_del.value = successor.value
             return self.del_simple_case(successor)
 
-    def del_simple_case(self, node_to_del):
+    def del_simple_case(self, node_to_del): # O(1) - pointers change
         parent = AVLNode(None)
         if (node_to_del.parent == None and (not node_to_del.left.isRealNode() or not node_to_del.right.isRealNode())):
             if (self.isLeaf(node_to_del)):
@@ -472,7 +472,7 @@ class AVLTreeList(object):
     @returns: a list of strings representing the data structure
     """
 
-    def listToArray(self):
+    def listToArray(self): # O(n) - in order trip
         if(self.size == 0):
             return []
         return self.listToArrayRec(self.root)
@@ -503,12 +503,12 @@ class AVLTreeList(object):
     @returns: an AVLTreeList where the values are sorted by the info of the original list.
     """
 
-    def sort(self):
+    def sort(self): #O(n*log n)
         lst = self.listToArray()
         lst = self.quick_sort(lst)
         return self.set_new_val_rec(lst, 0, len(lst)-1)
 
-    def quick_sort(self, lst):
+    def quick_sort(self, lst): #O(nlog n)
         if (len(lst) <= 1):
             return lst
         else:
@@ -527,7 +527,7 @@ class AVLTreeList(object):
     @returns: an AVLTreeList where the values are permuted randomly by the info of the original list. ##Use Randomness
     """
 
-    def permutation(self):
+    def permutation(self): #O(n)
         lst = self.listToArray()
         random_lst = []
         for i in range(self.length()):
@@ -537,7 +537,7 @@ class AVLTreeList(object):
 
         return self.set_new_val_rec(random_lst, 0, len(random_lst)-1)
 
-    def set_new_val_rec(self, lst, start, end):
+    def set_new_val_rec(self, lst, start, end): # o(n) - in order trip
         if (start > end):
             return AVLTreeList()
         if end - start == 0:
@@ -546,16 +546,6 @@ class AVLTreeList(object):
             tree.size = 1
             tree.update_firls_last()
             return tree
-        # if end - start == 1:
-        #     avl = AVLTreeList()
-        #     if(lst[start] >= lst[end]):
-        #        avl.insert(0,lst[end])
-        #        avl.insert(1,lst[start])
-        #        return avl
-        #     else:
-        #         avl.insert(0, lst[start])
-        #         avl.insert(1, lst[end])
-        #         return avl
         smaller_tree = self.set_new_val_rec(lst, start, (end + start)// 2 - 1)
         bigger_tree = self.set_new_val_rec(lst, (end + start) // 2 + 1, end)
         median = lst[(end + start)//2]
@@ -593,7 +583,7 @@ class AVLTreeList(object):
     @returns: the absolute value of the difference between the height of the AVL trees joined
     """
 
-    def concat(self, lst):
+    def concat(self, lst): #O(log n)
         if (lst.empty() and not self.empty()):
             return self.root.height
         if (not lst.empty() and self.empty()):
@@ -684,7 +674,7 @@ class AVLTreeList(object):
     @returns: the first index that contains val, -1 if not found.
     """
 
-    def search(self, val):
+    def search(self, val): #O(log n)
         if (self.empty()):
             return -1
         lst = self.listToArray()
@@ -702,71 +692,6 @@ class AVLTreeList(object):
     def getRoot(self):
         return self.root
 
-    def printt(self):
-        out = ""
-        for row in self.printree(self.root):  # need printree.py file
-            out = out + row + "\n"
-        print(out)
-
-    def printree(self, t, bykey=True):
-        # for row in trepr(t, bykey):
-        #        print(row)
-        return self.trepr(t, False)
-
-    def trepr(self, t, bykey=False):
-        if t == None:
-            return ["#"]
-
-        thistr = str(t.key) if bykey else str(t.getValue())
-
-        return self.conc(self.trepr(t.left, bykey), thistr, self.trepr(t.right, bykey))
-
-    def conc(self, left, root, right):
-
-        lwid = len(left[-1])
-        rwid = len(right[-1])
-        rootwid = len(root)
-
-        result = [(lwid + 1) * " " + root + (rwid + 1) * " "]
-
-        ls = self.leftspace(left[0])
-        rs = self.rightspace(right[0])
-        result.append(ls * " " + (lwid - ls) * "_" + "/" + rootwid *
-                      " " + "\\" + rs * "_" + (rwid - rs) * " ")
-
-        for i in range(max(len(left), len(right))):
-            row = ""
-            if i < len(left):
-                row += left[i]
-            else:
-                row += lwid * " "
-
-            row += (rootwid + 2) * " "
-
-            if i < len(right):
-                row += right[i]
-            else:
-                row += rwid * " "
-
-            result.append(row)
-
-        return result
-
-    def leftspace(self, row):
-        # row is the first row of a left node
-        # returns the index of where the second whitespace starts
-        i = len(row) - 1
-        while row[i] == " ":
-            i -= 1
-        return i + 1
-
-    def rightspace(self, row):
-        # row is the first row of a right node
-        # returns the index of where the first whitespace ends
-        i = 0
-        while row[i] == " ":
-            i += 1
-        return i
 
     def append(self, val):
         return self.insert(self.length(), val)
