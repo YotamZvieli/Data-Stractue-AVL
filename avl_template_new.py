@@ -362,7 +362,7 @@ class AVLTreeList(object):
     @returns: the number of rebalancing operation due to AVL rebalancing
     """
 
-    def delete(self, i): # o(log n) - one way trip update files and rotate
+    def delete(self, i): # o(log n) - one way trip update files and rotateְ
         if (i < 0 or i >= self.length()):
             return -1
         if (self.length() == 1):
