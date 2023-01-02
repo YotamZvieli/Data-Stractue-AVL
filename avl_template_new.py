@@ -7,7 +7,6 @@
 
 """A class represnting a node in an AVL tree"""
 import random
-from interactive_tree import interactive_tree
 
 class AVLNode(object):
     """Constructor, you are allowed to add more fields.
