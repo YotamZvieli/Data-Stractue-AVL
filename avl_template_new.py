@@ -474,15 +474,23 @@ class AVLTreeList(object):
     def listToArray(self): # O(n) - in order trip
         if(self.size == 0):
             return []
-        return self.listToArrayRec(self.root)
+        global in_order_lst
+        in_order_lst = []
+        self.listToArrayRec(self.root)
+        return in_order_lst
 
     def listToArrayRec(self, node):
+        global in_order_lst
         if (not node.isRealNode()):
-            return []
+            return None
         if (self.isLeaf(node)):
-            return [node.value]
+            in_order_lst.append(node.value)
+            return None
         else:
-            return self.listToArrayRec(node.left) + [node.value] + self.listToArrayRec(node.right)
+            self.listToArrayRec(node.left)
+            in_order_lst.append(node.value)
+            self.listToArrayRec(node.right)
+            return None
 
     """returns the size of the list 
 
