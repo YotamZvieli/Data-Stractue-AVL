@@ -525,8 +525,9 @@ class AVLTreeList(object):
             lst[pivot] = lst[-1]
             lst[-1] = temp
             bigger = [i for i in lst if i > temp]
+            equal = [i for i in lst if i == temp]
             smaller = [i for i in lst if i < temp]
-            return self.quick_sort(smaller) + [temp] + self.quick_sort(bigger)
+            return self.quick_sort(smaller) + equal + self.quick_sort(bigger)
 
     """permute the info values of the list 
 
@@ -544,7 +545,7 @@ class AVLTreeList(object):
 
         return self.set_new_val_rec(random_lst, 0, len(random_lst)-1)
 
-    def set_new_val_rec(self, lst, start, end): # o(n) - in order trip
+    def set_new_val_rec(self, lst, start, end): # o(n) - Build an avl from sorted list in linear time complexity, as presented in the class.
         if (start > end):
             return AVLTreeList()
         if end - start == 0:
@@ -590,7 +591,7 @@ class AVLTreeList(object):
     @returns: the absolute value of the difference between the height of the AVL trees joined
     """
 
-    def concat(self, lst): #O(log n)
+    def concat(self, lst): #O(max(log n,log m)) - m is the size of lst
         if (lst.empty() and not self.empty()):
             return self.root.height
         if (not lst.empty() and self.empty()):
@@ -601,6 +602,12 @@ class AVLTreeList(object):
             return lst.root.height
         if (self.empty() and lst.empty()):
             return 0
+        if(self.root.height <= lst.root.height):
+            connect_node = lst.retrieve_node(0)
+            lst.delete(0)
+        else:
+            connect_node = self.retrieve_node(self.length()-1)
+            self.delete(self.length()-1)
         h_diff = abs(lst.root.height - self.root.height)
         self_is_smaller = False
         if (self.length() <= lst.length()):
@@ -609,8 +616,6 @@ class AVLTreeList(object):
         else:
             h = lst.root.height
         if (h_diff == 0):  # even trees size
-            connect_node = lst.retrieve_node(0)
-            lst.delete(0)
             connect_node.left = self.root
             self.root.parent = connect_node
             connect_node.right = lst.root
@@ -620,8 +625,6 @@ class AVLTreeList(object):
             self.size = self.root.size
             self.update_firls_last()
         elif (self_is_smaller):
-            connect_node = lst.retrieve_node(0)
-            lst.delete(0)
             curr_node = lst.root
             while curr_node.height > h:
                 curr_node = curr_node.left
@@ -646,8 +649,7 @@ class AVLTreeList(object):
             self.root = prev
             self.update_firls_last()
         else:
-            connected_node = self.retrieve_node(self.length() - 1)
-            self.delete(self.length() - 1)
+            connected_node = connect_node
             curr_node = self.root
             while curr_node.height > h:
                 curr_node = curr_node.right
